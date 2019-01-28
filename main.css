@@ -5,3 +5,16 @@ img.main {
 body {
     font-family: verdana;
 }
+
+div#bg {
+    background-image:url("images/sites.png");
+    opacity:0.08;
+    position:absolute;
+    top:0;
+    bottom:0;
+    right:0;
+    left:0;
+    background-repeat: no-repeat;
+    background-size: cover;
+    z-index:-1;
+}
