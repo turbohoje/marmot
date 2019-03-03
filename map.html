@@ -29,16 +29,17 @@
             var map = new google.maps.Map(document.getElementById('map'), {
                 zoom: 19,
                 center: {lat: centerLa, lng: centerLo},
-                _mapTypeId: 'satellite'
+                mapTypeId: 'satellite'
             });
 
             //pixels 2392 x 1960.  ratio: 1.220408163265306
-            var mx = .87;
+            var mx = .85;
 
             var mapLLWidth = mx * 0.00068; //dont touch, based off pixel ratio
-            var mapLLHeight = mx * (0.00068 * 1.22); //dont touch
+            var mapLLHeight = mx * (0.00068 * 1.55); //dont touch, not 1.22 but it looks right based on circles and mercator or something
 
-            var offsetLa = centerLa + 0.00031;
+            //mod these to best center the png over the map
+            var offsetLa = centerLa + 0.00033;
             var offsetLo = centerLo + 0.00024;
 
             var bounds = new google.maps.LatLngBounds(
