@@ -6,3 +6,4 @@ DATE=`date +"%b-%d %H:%M"`
 COMMAND="s/<!--lastmod-->.*?<!--\\/lastmod-->/<!--lastmod-->${DATE}<!--\\/lastmod-->/"
 echo "Replacing mod date in index.html"
 perl -p -i -e "$COMMAND" index.html
+sleep 1
