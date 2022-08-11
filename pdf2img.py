@@ -54,3 +54,10 @@ for f in pdfs_to_convert:
     dest = p.sub('./images/files/',f)+".png"
     print("Converting "+f+" "+dest)
     convert_pdf(f, dest)
+
+pdfs_to_convert = glob.glob('./files/permit/owts/*.pdf')
+for f in pdfs_to_convert:
+    p = re.compile('./files/permit/')
+    dest = p.sub('./images/files/permit/owts/',f)+".png"
+    print("Converting "+f+" "+dest)
+    convert_pdf(f, dest)
