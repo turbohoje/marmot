@@ -16,7 +16,7 @@
 
   gtag('config', 'UA-42536493-2');
 
-cb=( new Date() ).getTime();
+
 </script>
 
 	<title>Cabin Build on Marmot Way</title>
@@ -25,11 +25,11 @@ cb=( new Date() ).getTime();
 <body><div id="bg"></div>
 
 <h1>Cabin Build on Marmot Way</h1>
-<h2>Site #66 - Last Update:   <!--lastmod-->Oct-05 18:50<!--/lastmod--></h2>
+<h2>Site #66 - Last Update:   <!--lastmod-->Oct-05 19:00<!--/lastmod--></h2>
 <p>42 marmot way box #1322<br>
 Telluride, CO, 81435-1322
 <h2>Latest Image</h2>
-<a href="https://storage.googleapis.com/tlco-public/latest.jpg" target="img"><img src="https://storage.googleapis.com/tlco-public/thumb.jpg"></a>
+<a href="https://storage.googleapis.com/tlco-public/latest.jpg" id="latestlink" target="img"><img id="latest" src="https://storage.googleapis.com/tlco-public/thumb.jpg"></a>
 
 <h2>Links</h2>
 <ul>
@@ -156,6 +156,14 @@ Telluride, CO, 81435-1322
 <a href="files/2020-09-14%20Site%2066%20OWTS%20Half%2011x17%20sealed.pdf" target="new"><h2>(2020-09-14) Site/Driveway Plan OWTS (onsite wastewater treatment) Approved</h2>
 	<img alt="Sept 14 Updated Driveway Plan OWTS" src="images/owts.png" class="main" />
 </a>
+<script>
 
+cb=( new Date() ).getTime();
+img=document.getElementById("latest");
+thumburl=document.getElementById("latestlink");
+
+img.src=img.src + "?" + cb;
+thumburl.href = thumburl.href + "?" + cb;
+</script>
 </body>
 </html>
