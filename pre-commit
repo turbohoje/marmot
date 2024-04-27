@@ -2,7 +2,7 @@
 # drop in the date to index.html since gitpages wont do this for me
 #sym link this to .git/hooks/pre-commit
 
-DATE=`date +"%b-%d %H:%M"`
+DATE=`date +"%b-%d"`
 COMMAND="s/<!--lastmod-->.*?<!--\\/lastmod-->/<!--lastmod-->${DATE}<!--\\/lastmod-->/"
 echo "Replacing mod date in index.html ${DATE}"
 perl -p -i -e "$COMMAND" index.html
