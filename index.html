@@ -30,7 +30,7 @@
 Telluride, CO, 81435-1322
 <h2>Latest Image</h2>
 <a href="https://storage.googleapis.com/tlco-public/latest.jpg" id="latestlink" target="img"><img id="latest" src="https://storage.googleapis.com/tlco-public/thumb.jpg"></a>
-
+<br/><a href="https://storage.googleapis.com/tlco-public/box.jpg" id="latestbox" target="img">Box Cam</a>
 <h2>Links</h2>
 <ul>
 	<li class="bold"><a href="foxblock/ProjectEstimator.pdf" target="new">Foxblock Order</a></li>
@@ -166,11 +166,14 @@ Telluride, CO, 81435-1322
 <script>
 
 cb=( new Date() ).getTime();
+
 img=document.getElementById("latest");
 thumburl=document.getElementById("latestlink");
-
 img.src=img.src + "?" + cb;
 thumburl.href = thumburl.href + "?" + cb;
+
+thumburlbox=document.getElementById("latestbox");
+thumburlbox.href = thumburlbox.href + "?" + cb;
 </script>
 </body>
 </html>
