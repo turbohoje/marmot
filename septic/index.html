@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta http-equiv="cache-control" content="max-age=0" />
+	<meta http-equiv="cache-control" content="no-cache" />
+	<meta http-equiv="expires" content="0" />
+	<meta http-equiv="expires" content="Tue, 02 Dec 1980 9:00:00 MST" />
+	<meta http-equiv="pragma" content="no-cache" />
+
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-42536493-2"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-42536493-2');
+
+
+</script>
+
+	<title>Cabin Build on Marmot Way</title>
+    <link rel="stylesheet" type="text/css" href="../main.css">
+</head>
+<body><div id="bg"></div>
+
+<h1>42 Marmot Way Septic Resources</h1>
+<h2><a href="Inv_1804_from_Billy_W._Sanchez_Inc._7412.pdf">Inv 1804 from Billy W. Sanchez Inc.</a></h2>
+This shows the 1500 gal septic tank.
+
+<h2>Images</h2>
+<!-- link up all the images in this direcoty, also show thumbnails -->
+<div id="images">
+    <script>
+        const imageExtensions = ['jpg', 'png'];
+        const imageFolder = '.';
+        const images = [
+            'PXL_20240831_230858773.jpg',
+            'PXL_20240831_235039414.MP.jpg',
+            'PXL_20240901_001555663.MP.jpg',
+            'tank.png'
+        ];
+
+        images.forEach(image => {
+            if (imageExtensions.includes(image.split('.').pop().toLowerCase())) {
+                const thumb = document.createElement('img');
+                thumb.src = `${imageFolder}/${image}`;
+                thumb.alt = image;
+                thumb.style.width = '100px'; // Thumbnail size
+                thumb.style.height = 'auto';
+
+                const link = document.createElement('a');
+                link.href = `${imageFolder}/${image}`;
+                link.target = '_blank';
+                link.appendChild(thumb);
+
+                document.getElementById('images').appendChild(link);
+            }
+        });
+    </script>
+</div>
+
+
+<script>
+cb=( new Date() ).getTime();
+
+img=document.getElementById("latest");
+thumburl=document.getElementById("latestlink");
+img.src=img.src + "?" + cb;
+thumburl.href = thumburl.href + "?" + cb;
+
+thumburlbox=document.getElementById("latestbox");
+thumburlbox.href = thumburlbox.href + "?" + cb;
+</script>
+</body>
+</html>
