@@ -34,11 +34,22 @@ This shows the 1500 gal septic tank.
     <script>
         const imageExtensions = ['jpg', 'png'];
         const imageFolder = '.';
+        // find . -type f \( -iname "*.jpg" -o -iname "*.png" \) | sed "s|.*/|'|" | sed "s|$|',|"
         const images = [
+            'IMG_7594.png',
+            'IMG_7597.png',
+            'cleanout.png',
+            'IMG_8986.png',
             'PXL_20240831_230858773.jpg',
             'PXL_20240831_235039414.MP.jpg',
+            'IMG_7558.png',
+            'IMG_7571.png',
+            'IMG_7567.png',
+            'IMG_7572.png',
+            'IMG_7566.png',
             'PXL_20240901_001555663.MP.jpg',
-            'tank.png'
+            'tank.png',
+            'IMG_7574.png',
         ];
 
         images.forEach(image => {
