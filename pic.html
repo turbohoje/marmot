@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Auto-Refreshing Images</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background: #000;
+    }
+    img {
+      display: block;
+      width: 100%;
+      height: auto;
+    }
+  </style>
+</head>
+<body>
+  <img id="img1" src="" alt="Latest Image">
+  <img id="img2" src="" alt="Box Image">
+
+  <script>
+    const img1 = document.getElementById("img1");
+    const img2 = document.getElementById("img2");
+
+    const url1 = "https://storage.googleapis.com/tlco-public/latest.jpg";
+    const url2 = "https://storage.googleapis.com/tlco-public/box.jpg";
+
+    function refreshImages() {
+      const epoch = Math.floor(Date.now() / 1000);
+      img1.src = `${url1}?t=${epoch}`;
+      img2.src = `${url2}?t=${epoch}`;
+    }
+
+    // Initial load
+    refreshImages();
+
+    // Refresh every 60 seconds
+    setInterval(refreshImages, 60000);
+  </script>
+</body>
+</html>
+
