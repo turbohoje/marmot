@@ -31,18 +31,26 @@
 <body>
   <img id="img1" src="" alt="Latest Image">
   <img id="img2" src="" alt="Box Image">
+  <img id="img3" src="" alt="Mountain View">
+  <img id="img4" src="" alt="Livng Room Upstairs">
 
   <script>
     const img1 = document.getElementById("img1");
     const img2 = document.getElementById("img2");
+    const img3 = document.getElementById("img3");
+    const img4 = document.getElementById("img4");
 
     const url1 = "https://cdn.justin-476.workers.dev/latest.jpg";
     const url2 = "https://cdn.justin-476.workers.dev/box.jpg";
+    const url3 = "https://cdn.justin-476.workers.dev/south.jpg";
+    const url4 = "https://cdn.justin-476.workers.dev/uphemi.jpg";
 
     function refreshImages() {
       const epoch = Math.floor(Date.now() / 1000);
       img1.src = `${url1}?t=${epoch}`;
       img2.src = `${url2}?t=${epoch}`;
+      img3.src = `${url3}?t=${epoch}`;
+      img4.src = `${url4}?t=${epoch}`;
     }
 
     // Initial load
