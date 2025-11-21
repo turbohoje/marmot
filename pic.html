@@ -35,29 +35,73 @@
   <img id="img4" src="" alt="Livng Room Upstairs">
 
   <script>
-    const img1 = document.getElementById("img1");
-    const img2 = document.getElementById("img2");
-    const img3 = document.getElementById("img3");
-    const img4 = document.getElementById("img4");
+      const img1 = document.getElementById("img1");
+      const img2 = document.getElementById("img2");
+      const img3 = document.getElementById("img3");
+      const img4 = document.getElementById("img4");
 
-    const url1 = "https://cdn.justin-476.workers.dev/latest.jpg";
-    const url2 = "https://cdn.justin-476.workers.dev/box.jpg";
-    const url3 = "https://cdn.justin-476.workers.dev/south.jpg";
-    const url4 = "https://cdn.justin-476.workers.dev/uphemi.jpg";
+      const url1 = "https://cdn.justin-476.workers.dev/latest.jpg";
+      const url2 = "https://cdn.justin-476.workers.dev/box.jpg";
+      const url3 = "https://cdn.justin-476.workers.dev/south.jpg";
+      const url4 = "https://cdn.justin-476.workers.dev/uphemi.jpg";
 
-    function refreshImages() {
-      const epoch = Math.floor(Date.now() / 1000);
-      img1.src = `${url1}?t=${epoch}`;
-      img2.src = `${url2}?t=${epoch}`;
-      img3.src = `${url3}?t=${epoch}`;
-      img4.src = `${url4}?t=${epoch}`;
-    }
+      // --- Configuration ---
+      // Define the 'dark' period start and end hour (24-hour format, local to Denver)
+      // Assuming 'dark' is from 8 PM to 6 AM (20:00 to 06:00)
+      const DARK_HOUR_START = 20; // 8:00 PM
+      const DARK_HOUR_END = 6;    // 6:00 AM
 
-    // Initial load
-    refreshImages();
+      // Refresh interval in milliseconds
+      const NORMAL_INTERVAL = 60000; // 60 seconds (1 minute)
+      // Target: Twice every hour -> 60 minutes * 60 seconds / 2 refreshes = 1800 seconds
+      const SLOW_INTERVAL = 1800000; // 30 minutes (1800 seconds * 1000)
 
-    // Refresh every 60 seconds
-    setInterval(refreshImages, 60000);
+      function refreshImages() {
+          const epoch = Math.floor(Date.now() / 1000);
+          img1.src = `${url1}?t=${epoch}`;
+          img2.src = `${url2}?t=${epoch}`;
+          img3.src = `${url3}?t=${epoch}`;
+          img4.src = `${url4}?t=${epoch}`;
+      }
+
+      function scheduleRefresh() {
+          // 1. Get the current hour in Denver (Mountain Time)
+          // Using toLocaleString with timeZone: 'America/Denver' to get the hour
+          // considering Daylight Saving Time (MST/MDT).
+          const denverTime = new Date();
+          const denverHour = parseInt(denverTime.toLocaleString('en-US', {
+              hour: 'numeric',
+              hourCycle: 'h23',
+              timeZone: 'America/Denver'
+          }));
+
+          // 2. Determine if it's 'dark'
+          let isDark;
+          if (DARK_HOUR_START > DARK_HOUR_END) {
+              // Dark period spans overnight (e.g., 20:00 to 06:00)
+              isDark = (denverHour >= DARK_HOUR_START) || (denverHour < DARK_HOUR_END);
+          } else {
+              // Dark period is fully within one day (e.g., 20:00 to 23:00)
+              isDark = (denverHour >= DARK_HOUR_START) && (denverHour < DARK_HOUR_END);
+          }
+
+          // 3. Set the interval
+          const interval = isDark ? SLOW_INTERVAL : NORMAL_INTERVAL;
+
+          // 4. Perform the refresh and schedule the next one
+          if (!document.hidden) {
+              // Only refresh if the page is visible to save resources
+              refreshImages();
+              console.log(`Refreshed at: ${new Date().toLocaleString('en-US', { timeZone: 'America/Denver' })}. Interval set to: ${interval / 1000 / 60} minutes (${isDark ? 'SLOW' : 'NORMAL'}).`);
+          } else {
+              console.log(`Page hidden. Skipping refresh. Interval set to: ${interval / 1000 / 60} minutes (${isDark ? 'SLOW' : 'NORMAL'}).`);
+          }
+
+          setTimeout(scheduleRefresh, interval);
+      }
+
+      // Initial call to start the refresh loop
+      scheduleRefresh();
   </script>
 </body>
 </html>
