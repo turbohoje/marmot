@@ -234,19 +234,19 @@
   <header>
     <h1>Weekly Time Lapse</h1>
     <div class="subtitle">
-      3 sets of daily time-lapse videos from your CDN, aligned by weekday.
+      daily time lapses
     </div>
     <div class="legend">
       <span class="badge">
         <span class="badge-dot"></span>
-        Yesterday highlighted
+        Yesterday (latest)
       </span>
       <span class="legend-pill">
         <span class="legend-swatch"></span>
-        Showing a frame ~1 minute in (click to view full video)
+        Thumbnail 1 min into vid
       </span>
       <span class="small">
-        Static HTML + JavaScript, no backend.
+        
       </span>
     </div>
   </header>
@@ -264,206 +264,241 @@
   </div>
 
   <script>
-    // Base URL for your Cloudflare Worker proxying the GCS bucket
-    const CDN_BASE = "https://cdn.justin-476.workers.dev/";
+    document.addEventListener("DOMContentLoaded", () => {
+      // Base URL for your Cloudflare Worker proxying the GCS bucket
+      const CDN_BASE = "https://cdn.justin-476.workers.dev/";
 
-    // Cameras / sets
-    const cameraConfig = [
-      { label: "Camera 1", index: 1 },
-      { label: "Camera 2", index: 2 },
-      { label: "Camera 3", index: 3 },
-    ];
+      // Cameras / sets
+      const cameraConfig = [
+        { label: "Camera 1", index: 1 },
+        { label: "Camera 2", index: 2 },
+        { label: "Camera 3", index: 3 },
+      ];
 
-    // Day ordering + labels
-    const dayKeys = ["sun", "mon", "tue", "wed", "thu", "fri", "sat"];
-    const dayLabels = {
-      sun: "Sun",
-      mon: "Mon",
-      tue: "Tue",
-      wed: "Wed",
-      thu: "Thu",
-      fri: "Fri",
-      sat: "Sat",
-    };
-
-    // Map from key to filename day name
-    const fileDayNames = {
-      sun: "Sunday",
-      mon: "Monday",
-      tue: "Tuesday",
-      wed: "Wednesday",
-      thu: "Thursday",
-      fri: "Friday",
-      sat: "Saturday",
-    };
-
-    function buildVideoUrl(cameraIndex, dayKey) {
-      const dayName = fileDayNames[dayKey];
-      return CDN_BASE + cameraIndex + "_" + dayName + ".mp4";
-    }
-
-    // Determine yesterday (based on browser's local time)
-    function getYesterdayKey() {
-      const today = new Date();
-      const todayIndex = today.getDay(); // 0=Sun ... 6=Sat
-      const yesterdayIndex = (todayIndex + 6) % 7;
-      return dayKeys[yesterdayIndex];
-    }
-
-    const yesterdayKey = getYesterdayKey();
-
-    // Seek to a preview time (default 60 seconds) and pause there
-    function setupPreviewFrame(video, previewSeconds = 60) {
-      video.addEventListener("loadedmetadata", () => {
-        let target = previewSeconds;
-        if (!isFinite(video.duration) || video.duration <= 0) {
-          target = 1;
-        } else if (video.duration <= previewSeconds) {
-          target = Math.min(video.duration - 1, video.duration / 2);
-          if (!isFinite(target) || target < 0) target = 1;
-        }
-
-        const onSeeked = () => {
-          video.pause();
-          video.removeEventListener("seeked", onSeeked);
-        };
-
-        video.addEventListener("seeked", onSeeked);
-        video.currentTime = target;
-      });
-
-      video.autoplay = false;
-    }
-
-    // Handle missing / non-existent video file
-    function setupErrorFallback(video, wrapper) {
-      video.addEventListener("error", () => {
-        wrapper.innerHTML = "";
-        wrapper.classList.add("empty");
-        wrapper.textContent = "Video not available";
-      });
-    }
-
-    // Modal controls
-    const modal = document.getElementById("video-modal");
-    const modalVideo = document.getElementById("modal-video");
-    const modalCloseBtn = document.getElementById("modal-close");
-    const modalContent = document.getElementById("modal-content");
-
-    function openModalWithSrc(src) {
-      modalVideo.pause();
-      modalVideo.src = src;
-      modalVideo.currentTime = 0;
-      modal.classList.add("open");
-
-      // Play from beginning when metadata is loaded
-      const onMeta = () => {
-        modalVideo.currentTime = 0;
-        modalVideo.play().catch(() => {
-          // autoplay might be blocked; controls still usable
-        });
-        modalVideo.removeEventListener("loadedmetadata", onMeta);
+      // Day ordering + labels
+      const dayKeys = ["sun", "mon", "tue", "wed", "thu", "fri", "sat"];
+      const dayLabels = {
+        sun: "Sun",
+        mon: "Mon",
+        tue: "Tue",
+        wed: "Wed",
+        thu: "Thu",
+        fri: "Fri",
+        sat: "Sat",
       };
-      modalVideo.addEventListener("loadedmetadata", onMeta);
-    }
 
-    function closeModal() {
-      modal.classList.remove("open");
-      modalVideo.pause();
-      // Clear the src to stop network activity
-      modalVideo.removeAttribute("src");
-      modalVideo.load();
-    }
+      // Map from key to filename day name
+      const fileDayNames = {
+        sun: "Sunday",
+        mon: "Monday",
+        tue: "Tuesday",
+        wed: "Wednesday",
+        thu: "Thursday",
+        fri: "Friday",
+        sat: "Saturday",
+      };
 
-    modalCloseBtn.addEventListener("click", closeModal);
-
-    // Click on overlay (but not on modal content) closes it
-    modal.addEventListener("click", (e) => {
-      if (!modalContent.contains(e.target)) {
-        closeModal();
+      function buildVideoUrl(cameraIndex, dayKey) {
+        const dayName = fileDayNames[dayKey];
+        return CDN_BASE + cameraIndex + "_" + dayName + ".mp4";
       }
-    });
 
-    // ESC key closes modal
-    document.addEventListener("keydown", (e) => {
-      if (e.key === "Escape" && modal.classList.contains("open")) {
-        closeModal();
+      // Determine yesterday (based on browser's local time)
+      function getYesterdayKey() {
+        const today = new Date();
+        const todayIndex = today.getDay(); // 0=Sun ... 6=Sat
+        const yesterdayIndex = (todayIndex + 6) % 7;
+        return dayKeys[yesterdayIndex];
       }
-    });
 
-    function buildGrid() {
-      const table = document.getElementById("video-grid");
-      table.innerHTML = "";
+      const yesterdayKey = getYesterdayKey();
 
-      // Header
-      const thead = document.createElement("thead");
-      const headerRow = document.createElement("tr");
+      // Seek to a preview time (default 60 seconds) and pause there
+      function setupPreviewFrame(video, previewSeconds = 60) {
+        video.addEventListener("loadedmetadata", () => {
+          let target = previewSeconds;
+          if (!isFinite(video.duration) || video.duration <= 0) {
+            target = 1;
+          } else if (video.duration <= previewSeconds) {
+            target = Math.min(video.duration - 1, video.duration / 2);
+            if (!isFinite(target) || target < 0) target = 1;
+          }
 
-      const cornerTh = document.createElement("th");
-      cornerTh.className = "set-label-cell";
-      cornerTh.textContent = "Set";
-      headerRow.appendChild(cornerTh);
+          const onSeeked = () => {
+            video.pause();
+            video.removeEventListener("seeked", onSeeked);
+          };
 
-      dayKeys.forEach((dayKey) => {
-        const th = document.createElement("th");
-        if (dayKey === yesterdayKey) th.classList.add("yesterday-col");
-        th.textContent = dayLabels[dayKey];
-        headerRow.appendChild(th);
+          video.addEventListener("seeked", onSeeked);
+          video.currentTime = target;
+        });
+
+        video.autoplay = false;
+      }
+
+      // Handle missing / non-existent video file
+      function setupErrorFallback(video, wrapper) {
+        video.addEventListener("error", () => {
+          wrapper.innerHTML = "";
+          wrapper.classList.add("empty");
+          wrapper.textContent = "Video not available";
+        });
+      }
+
+      // Modal controls
+      const modal = document.getElementById("video-modal");
+      const modalVideo = document.getElementById("modal-video");
+      const modalCloseBtn = document.getElementById("modal-close");
+      const modalContent = document.getElementById("modal-content");
+
+      function openModalWithSrc(src) {
+        modalVideo.pause();
+        modalVideo.src = src;
+        modalVideo.currentTime = 0;
+        modal.classList.add("open");
+
+        const onMeta = () => {
+          modalVideo.currentTime = 0;
+          modalVideo.play().catch(() => {
+            // autoplay might be blocked by browser; controls still usable
+          });
+          modalVideo.removeEventListener("loadedmetadata", onMeta);
+        };
+        modalVideo.addEventListener("loadedmetadata", onMeta);
+      }
+
+      function closeModal() {
+        modal.classList.remove("open");
+        modalVideo.pause();
+        modalVideo.removeAttribute("src");
+        modalVideo.load();
+      }
+
+      if (modalCloseBtn) {
+        modalCloseBtn.addEventListener("click", (e) => {
+          e.stopPropagation();
+          closeModal();
+        });
+      }
+
+      // Click on overlay (but not on modal content) closes it
+      if (modal) {
+        modal.addEventListener("click", (e) => {
+          if (!modalContent.contains(e.target)) {
+            closeModal();
+          }
+        });
+      }
+
+      // ESC key closes modal
+      document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape" && modal.classList.contains("open")) {
+          closeModal();
+        }
       });
 
-      thead.appendChild(headerRow);
-      table.appendChild(thead);
+      // Build grid
+      function buildGrid() {
+        const table = document.getElementById("video-grid");
+        table.innerHTML = "";
 
-      // Body
-      const tbody = document.createElement("tbody");
+        // Header
+        const thead = document.createElement("thead");
+        const headerRow = document.createElement("tr");
 
-      cameraConfig.forEach((cam) => {
-        const row = document.createElement("tr");
+        const cornerTh = document.createElement("th");
+        cornerTh.className = "set-label-cell";
+        cornerTh.textContent = "Set";
+        headerRow.appendChild(cornerTh);
 
-        // Label cell
-        const labelCell = document.createElement("td");
-        labelCell.className = "set-label-cell";
-        const labelSpan = document.createElement("span");
-        labelSpan.className = "set-label";
-        labelSpan.textContent = cam.label;
-        labelCell.appendChild(labelSpan);
-        row.appendChild(labelCell);
-
-        // One cell per day
         dayKeys.forEach((dayKey) => {
-          const td = document.createElement("td");
-          if (dayKey === yesterdayKey) td.classList.add("yesterday-col");
+          const th = document.createElement("th");
+          if (dayKey === yesterdayKey) th.classList.add("yesterday-col");
+          th.textContent = dayLabels[dayKey];
+          headerRow.appendChild(th);
+        });
 
-          const wrapper = document.createElement("div");
-          wrapper.className = "video-wrapper";
+        thead.appendChild(headerRow);
+        table.appendChild(thead);
 
-          const video = document.createElement("video");
-          video.src = buildVideoUrl(cam.index, dayKey);
-          video.controls = true;
-          video.preload = "metadata";
+        // Body
+        const tbody = document.createElement("tbody");
 
-          setupPreviewFrame(video, 60);
-          setupErrorFallback(video, wrapper);
+        cameraConfig.forEach((cam) => {
+          const row = document.createElement("tr");
 
-          // Clicking the small video opens the modal from the beginning
-          video.addEventListener("click", (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            openModalWithSrc(video.src);
+          // Label cell
+          const labelCell = document.createElement("td");
+          labelCell.className = "set-label-cell";
+          const labelSpan = document.createElement("span");
+          labelSpan.className = "set-label";
+          labelSpan.textContent = cam.label;
+          labelCell.appendChild(labelSpan);
+          row.appendChild(labelCell);
+
+          // One cell per day
+          dayKeys.forEach((dayKey) => {
+            const td = document.createElement("td");
+            if (dayKey === yesterdayKey) td.classList.add("yesterday-col");
+
+            const wrapper = document.createElement("div");
+            wrapper.className = "video-wrapper";
+
+            const video = document.createElement("video");
+            const src = buildVideoUrl(cam.index, dayKey);
+
+            const deepLinkId = `cam${cam.index}-${dayKey}`;
+            td.dataset.deepLinkId = deepLinkId;
+            video.dataset.deepLinkId = deepLinkId;
+            video.src = src;
+            video.controls = true;
+            video.preload = "metadata";
+
+            setupPreviewFrame(video, 60);
+            setupErrorFallback(video, wrapper);
+
+            // Clicking the small video opens the modal from the beginning
+            video.addEventListener("click", (e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              // update hash for deep-linking
+              window.location.hash = deepLinkId;
+              openModalWithSrc(video.src);
+            });
+
+            wrapper.appendChild(video);
+            td.appendChild(wrapper);
+            row.appendChild(td);
           });
 
-          wrapper.appendChild(video);
-          td.appendChild(wrapper);
-          row.appendChild(td);
+          tbody.appendChild(row);
         });
 
-        tbody.appendChild(row);
-      });
+        table.appendChild(tbody);
+      }
 
-      table.appendChild(tbody);
-    }
+      buildGrid();
 
-    buildGrid();
+      // Deep-link support:
+      // Hash format: #cam{index}-{dayKey}, e.g. #cam1-mon
+      function openFromHash() {
+        const hash = window.location.hash.replace("#", "");
+        if (!hash) return;
+
+        const cell = document.querySelector(`[data-deep-link-id="${hash}"] video`);
+        if (cell && cell.src) {
+          // scroll into view and open
+          cell.scrollIntoView({ behavior: "smooth", block: "center", inline: "center" });
+          openModalWithSrc(cell.src);
+        }
+      }
+
+      // On first load
+      openFromHash();
+
+      // If hash changes later (e.g., user pastes a new deep link)
+      window.addEventListener("hashchange", openFromHash);
+    });
   </script>
 </body>
 </html>
